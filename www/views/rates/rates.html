@@ -1,0 +1,30 @@
+<ion-view view-title="Current Rates" hide-back-button="true">
+  <ion-nav-buttons side="primary">
+    <button class="button" ng-click="openHelp($event)">About</button>
+  </ion-nav-buttons>
+  <ion-content>
+    <ion-refresher on-refresh="load()" pulling-text="Pull to Refresh"></ion-refresher>
+    <ion-list>
+       <!--ngRepeat to  loop over currencies and filter out any that aren't active-->
+      <ion-item ng-repeat="currency in currencies | filter:{selected:true}" ui-sref="tabs.detail({currency: currency.code})">
+        {{currency.code}} - {{currency.text}}
+        <!-- Price box shown when current price equal to 24-hour average-->
+        <span class="price" ng-if="currency.ticker.last == currency.ticker['24h_avg']">
+          {{currency.ticker.last || '0.00'}}<br />0.00
+        </span>
+        <!-- Price box shown when current price below 24-hour average-->
+        <span class="price negative" ng-if="currency.ticker.last < currency.ticker['24h_avg']">
+          {{currency.ticker.last}}<br /><span class="icon ion-arrow-down-b"></span> {{currency.ticker['24h_avg'] - currency.ticker.last | number:2}}
+        </span>
+        <!-- Price box shown when current price above 24-hour average-->
+        <span class="price positive" ng-if="currency.ticker.last > currency.ticker['24h_avg']">
+          {{currency.ticker.last}}<br /><span class="icon ion-arrow-up-b"></span> {{currency.ticker.last - currency.ticker['24h_avg'] | number:2}}
+        </span>
+      </ion-item>
+    </ion-list>
+  </ion-content>
+  <!-- ionFooterBar to keep a footer bar with last time data was loaded-->
+  <ion-footer-bar class="bar-dark">
+    <h1 class="title">Updated {{currencies[0].ticker.timestamp | date:'mediumTime'}}</h1>
+  </ion-footer-bar>
+</ion-view>
